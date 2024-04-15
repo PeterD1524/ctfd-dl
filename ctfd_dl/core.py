@@ -34,15 +34,16 @@ class Downloader:
         await self.download_challenge_list()
         # await self.download_scoreboard()
         # await self.download_team_list()
-        # await self.download_team_private()
+        await self.download_team_private()
         # await self.download_user_list()
-        # await self.download_user_private()
-        pass
+        await self.download_user_private()
 
     async def download_challenge_list(self):
+        print("downloading challenge list")
         async with self.client.get_challenge_list() as result:
             await self.write_json(result.exchange)
         for challenge in result.value.data:
+            print("downloading challenge {}".format(challenge.id))
             await self.download_challenge(challenge_id=challenge.id)
             # async with self.client.get_challenge_solves(
             #     challenge_id=challenge.id
@@ -51,7 +52,6 @@ class Downloader:
 
     async def download_challenge(self, *, challenge_id: int):
         async with self.client.get_challenge(challenge_id=challenge_id) as result:
-            print(result.value.data.files)
             await self.write_json(result.exchange)
             for file in result.value.data.files:
                 await self.download_challenge_file(file)
@@ -91,6 +91,7 @@ class Downloader:
             page = next
 
     async def download_team_private(self):
+        print("downloading team private")
         async with self.client.get_team_private() as result:
             await self.write_json(result.exchange)
         async with self.client.get_team_private_solves() as result:
@@ -114,8 +115,8 @@ class Downloader:
             page = next
 
     async def download_user_private(self):
+        print("downloading user private")
         async with self.client.get_user_private() as result:
-            print(result.value)
             await self.write_json(result.exchange)
 
     async def download_challenge_file(self, url: str):
